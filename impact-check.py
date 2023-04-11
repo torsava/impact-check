@@ -3,7 +3,9 @@
 import argparse
 import os
 import re
+import shlex
 import shutil
+import subprocess
 
 parser = argparse.ArgumentParser()
 parser.add_argument("url", help="Link to the PR that should be impact checked. \
@@ -20,6 +22,9 @@ except AttributeError:
 
 # Create working directory
 os.mkdir(path)
+
+wget = f"wget -P {path} {args.url}"
+subprocess.run(shlex.split(wget))
 
 # Clean up, remove working directory
 shutil.rmtree(path)
