@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import argparse
+import glob
 import os
 import re
 import secrets
@@ -43,6 +44,13 @@ subprocess.run(shlex.split(git_apply))
 uuid = secrets.token_hex(4)
 new_copr = f"copr-cli create {args.copr}/{package_name}-{uuid} --chroot {args.chroot}"
 subprocess.run(shlex.split(new_copr))
+
+fedpkg_srpm = "fedpkg --release rawhide srpm"
+subprocess.run(shlex.split(fedpkg_srpm))
+
+build = f"copr-cli build {args.copr}/{package_name}-{uuid} {glob.glob('*.src.rpm')[0]}"
+subprocess.run(shlex.split(build))
+
 
 # Clean up, remove working directory
 shutil.rmtree(path)
