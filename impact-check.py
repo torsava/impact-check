@@ -71,7 +71,7 @@ deps = []
 for pkg in provides:
     [deps.append(x) for x in repoquery(whatrequires=pkg.split(' ')[0], recursive=True)]
 
-for pkg in [ x for x in deps if "src" in x ]:
+for pkg in list(set([ x for x in deps if "src" in x ])):
     copr_build = f"copr build-distgit {args.copr}/{package_name}-{uuid} --nowait --name {pkg.rsplit('-', 2)[0]}"
     subprocess.run(shlex.split(copr_build))
 
