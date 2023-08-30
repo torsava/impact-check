@@ -10,6 +10,7 @@ import shutil
 import subprocess
 
 parser = argparse.ArgumentParser()
+# Allow empty default, which uses the default copr user
 parser.add_argument("copr", help="Copr user/@group where the testing Copr \
 should be created")
 parser.add_argument("url", help="Link to the PR that should be impact checked. \
@@ -56,6 +57,7 @@ subprocess.run(shlex.split(wget))
 git_apply = f"git apply {pr_number}"
 subprocess.run(shlex.split(git_apply))
 
+# add date&time to the copr in addition to the uuid to make it easier to identify, and make collisions extremely unlikely (for long running CI for example)
 uuid = secrets.token_hex(4)
 new_copr = f"copr-cli create {args.copr}/{package_name}-{uuid} --chroot {args.chroot}"
 subprocess.run(shlex.split(new_copr))
@@ -71,10 +73,11 @@ deps = []
 for pkg in provides:
     [deps.append(x) for x in repoquery(whatrequires=pkg.split(' ')[0], recursive=True)]
 
-for pkg in list(set([ x for x in deps if "src" in x ])):
+for pkg in list(set([x for x in deps if "src" in x])):
     copr_build = f"copr build-distgit {args.copr}/{package_name}-{uuid} --nowait --name {pkg.rsplit('-', 2)[0]}"
     subprocess.run(shlex.split(copr_build))
 
 # Clean up, remove working directory
 shutil.rmtree(path)
 
+# Next steps?: Evaluation of failed builds, rebuilding in a testing copr
