@@ -77,4 +77,3 @@ for pkg in list(set([ x for x in deps if "src" in x ])):
 
 # Clean up, remove working directory
 shutil.rmtree(path)
-
